@@ -40,7 +40,9 @@ pub trait Dataset<D: Datum>:
             .has_headers(true)
             .from_writer(handle);
         info!("Writing...");
-        writer.serialize(self)?;
+        for item in self {
+            writer.serialize(item)?;
+        }
         Ok(())
     }
 

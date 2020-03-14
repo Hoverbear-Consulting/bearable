@@ -1,12 +1,13 @@
 use crate::{
     components::{
-        auxililary::{Create, List},
+        auxililary::{Create, Interactive, List},
         Component,
     },
     datum::Client,
 };
 use anyhow::{anyhow, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
+use dialoguer::Input;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tracing::{field, trace};
@@ -28,4 +29,13 @@ impl Component for Client {
     }
 }
 
-impl Create<Client> {}
+impl Interactive for Client {
+    fn interactive() -> Result<Self> {
+        Ok(Self {
+            name: Input::new().with_prompt("name").interact()?,
+            address: Input::new().with_prompt("address").interact()?,
+            currency: Input::new().with_prompt("currency").interact()?,
+            billing: Input::new().with_prompt("billing").interact()?,
+        })
+    }
+}

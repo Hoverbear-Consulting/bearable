@@ -6,10 +6,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Client {
-    name: String,
-    address: String,
-    currency: Currency,
-    billing: BillingMethod,
+    pub name: String,
+    pub address: String,
+    pub currency: Currency,
+    pub billing: BillingMethod,
 }
 
 impl Datum for Client {

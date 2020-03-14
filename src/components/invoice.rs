@@ -1,3 +1,4 @@
+use crate::components::auxililary::Interactive;
 use crate::{
     components::{auxililary::Create, Component},
     datum::Invoice,
@@ -17,6 +18,12 @@ impl Component for Invoice {
 
     fn handle(args: &ArgMatches) -> Result<()> {
         trace!(args = field::debug(args));
+        unimplemented!()
+    }
+}
+
+impl Interactive for Invoice {
+    fn interactive() -> Result<Self> {
         unimplemented!()
     }
 }
