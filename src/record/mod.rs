@@ -9,3 +9,7 @@ pub use currency::Currency;
 
 mod billing_method;
 pub use billing_method::BillingMethod;
+
+trait HasVariants {
+    fn variants() -> Vec<String>;
+}

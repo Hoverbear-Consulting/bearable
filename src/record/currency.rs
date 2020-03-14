@@ -1,3 +1,4 @@
+use crate::record::HasVariants;
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
@@ -11,6 +12,23 @@ pub enum Currency {
     Chinese,
     European,
     British,
+}
+
+pub const CURRENCIES: &[Currency] = &[
+    Currency::Canadian,
+    Currency::American,
+    Currency::Chinese,
+    Currency::European,
+    Currency::British,
+];
+
+impl HasVariants for Currency {
+    fn variants() -> Vec<String> {
+        CURRENCIES
+            .iter()
+            .map(|v| format!("{}", v))
+            .collect::<Vec<_>>()
+    }
 }
 
 impl Display for Currency {

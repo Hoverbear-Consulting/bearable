@@ -1,3 +1,4 @@
+use crate::record::HasVariants;
 use anyhow::anyhow;
 use serde::export::fmt::Error;
 use serde::export::Formatter;
@@ -16,6 +17,22 @@ pub enum BillingMethod {
     Transferwise,
     /// The cold, solid stuff
     Cash,
+}
+
+pub const BILLING_METHODS: &[BillingMethod] = &[
+    BillingMethod::AutomatedClearingHouse,
+    BillingMethod::Interac,
+    BillingMethod::Transferwise,
+    BillingMethod::Cash,
+];
+
+impl HasVariants for BillingMethod {
+    fn variants() -> Vec<String> {
+        BILLING_METHODS
+            .iter()
+            .map(|v| format!("{}", v))
+            .collect::<Vec<_>>()
+    }
 }
 
 impl Display for BillingMethod {

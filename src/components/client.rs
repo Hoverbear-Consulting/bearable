@@ -31,11 +31,18 @@ impl Component for Client {
 
 impl Interactive for Client {
     fn interactive() -> Result<Self> {
+        let theme = dialoguer::theme::ColorfulTheme::default();
         Ok(Self {
-            name: Input::new().with_prompt("name").interact()?,
-            address: Input::new().with_prompt("address").interact()?,
-            currency: Input::new().with_prompt("currency").interact()?,
-            billing: Input::new().with_prompt("billing").interact()?,
+            name: Input::with_theme(&theme).with_prompt("name").interact()?,
+            address: Input::with_theme(&theme)
+                .with_prompt("address")
+                .interact()?,
+            currency: Input::with_theme(&theme)
+                .with_prompt("currency")
+                .interact()?,
+            billing: Input::with_theme(&theme)
+                .with_prompt("billing")
+                .interact()?,
         })
     }
 }
