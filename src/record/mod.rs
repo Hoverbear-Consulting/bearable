@@ -1,15 +1,23 @@
-mod line_item;
-pub use line_item::LineItem;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
-mod money;
-pub use money::Money;
+mod auxiliary;
 
-mod currency;
-pub use currency::Currency;
+mod client;
+pub use client::Client;
 
-mod billing_method;
-pub use billing_method::BillingMethod;
+mod invoice;
+pub use invoice::Invoice;
 
-trait HasVariants {
-    fn variants() -> Vec<String>;
+mod root;
+pub use root::Root;
+
+mod expense_report;
+pub use expense_report::ExpenseReport;
+use serde::de::DeserializeOwned;
+use std::any::Any;
+
+pub trait Datum: Serialize + DeserializeOwned + Debug + Clone {
+    const STORE: &'static str;
 }

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Invoice {
-    customer: Client,
+    client: Client,
     number: usize,
     date_issued: DateTime<Utc>,
     lines: Vec<LineItem>,
@@ -18,5 +18,5 @@ impl Datum for Invoice {
 
 impl HasKey for Invoice {
     type Key = (String, usize);
-    const KEY_FIELDS: &'static [&'static str] = &["customer", "number"];
+    const KEY_FIELDS: &'static [&'static str] = &["client", "number"];
 }
