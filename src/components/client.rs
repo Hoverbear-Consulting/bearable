@@ -1,30 +1,31 @@
 use crate::{
-    datatypes::{BillingMethod, Currency, LineItem},
-    components::Component,
+    components::{
+        auxililary::{Create, List},
+        Component,
+    },
+    datum::Client,
 };
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Client;
+use tracing::{field, trace};
 
 impl Component for Client {
-    const STORE: Option<&'static str> = None;
-
     fn app() -> App<'static, 'static> {
         App::new("client")
             .settings(&[AppSettings::SubcommandRequiredElseHelp])
-            .subcommands(vec![
-                App::new("create").arg(Arg::with_name("name")),
-                App::new("delete"),
-                App::new("list"),
-                App::new("edit"),
-            ])
+            .subcommands(vec![Create::<Self>::app(), List::<Self>::app()])
     }
 
     fn handle(args: &ArgMatches) -> Result<()> {
-        unimplemented!()
+        trace!(args = field::debug(args));
+        match args.subcommand() {
+            ("create", Some(args)) => <Create<Self> as Component>::handle(args),
+            ("list", Some(args)) => <List<Self> as Component>::handle(args),
+            _ => Err(anyhow!("Invalid subcommand.")),
+        }
     }
 }
+
+impl Create<Client> {}

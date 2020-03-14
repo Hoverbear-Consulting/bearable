@@ -1,25 +1,22 @@
-use crate::{components::{Client, Component}, datatypes::LineItem};
-use anyhow::{anyhow, Result};
+use crate::{
+    components::{auxililary::Create, Component},
+    datum::ExpenseReport,
+};
+use anyhow::Result;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ExpenseReport;
+use std::path::Path;
+use tracing::{field, trace};
 
 impl Component for ExpenseReport {
-    const STORE: Option<&'static str> = None;
-
     fn app() -> App<'static, 'static> {
         App::new("expense-report")
             .settings(&[AppSettings::SubcommandRequiredElseHelp])
-            .subcommands(vec![
-                App::new("create"),
-                App::new("delete"),
-                App::new("edit"),
-            ])
+            .subcommands(vec![<Create<Self> as Component>::app()])
     }
 
     fn handle(args: &ArgMatches) -> Result<()> {
+        trace!(args = field::debug(args));
         unimplemented!()
     }
 }

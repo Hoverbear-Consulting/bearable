@@ -1,5 +1,5 @@
 [package]
-name = "company"
+name = "bearable"
 version = "0.1.0"
 authors = ["Ana Hobden <operator@hoverbear.org>"]
 edition = "2018"
@@ -17,3 +17,6 @@ tracing = "0.1"
 tracing-subscriber = "0.2"
 clap = "2.33.0"
 chrono = { version = "0.4.11", features = ["serde"] }
+console = "0.10.0"
+dialoguer = "0.5.0"
+indicatif = "0.14.0"
