@@ -1,6 +1,6 @@
 use super::{Client, Datum};
-use crate::datum::auxiliary::HasKey;
-use crate::record::LineItem;
+use crate::field::LineItem;
+use crate::record::auxiliary::HasKey;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -15,6 +15,8 @@ impl Datum for ExpenseReport {
 }
 
 impl HasKey for ExpenseReport {
-    type Key = (String, usize);
-    const KEY_FIELDS: &'static [&'static str] = &["customer", "number"];
+    type ChunkKeys = Client;
+    const CHUNK_KEY_FIELDS: &'static [&'static str] = &["customer"];
+    type ItemKeys = usize;
+    const ITEM_KEY_FIELDS: &'static [&'static str] = &["number"];
 }

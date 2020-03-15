@@ -1,6 +1,6 @@
 use super::{Client, Datum};
-use crate::datum::auxiliary::HasKey;
-use crate::record::LineItem;
+use crate::field::LineItem;
+use crate::record::auxiliary::HasKey;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +17,8 @@ impl Datum for Invoice {
 }
 
 impl HasKey for Invoice {
-    type Key = (String, usize);
-    const KEY_FIELDS: &'static [&'static str] = &["client", "number"];
+    type ChunkKeys = Client;
+    const CHUNK_KEY_FIELDS: &'static [&'static str] = &["customer"];
+    type ItemKeys = usize;
+    const ITEM_KEY_FIELDS: &'static [&'static str] = &["number"];
 }
