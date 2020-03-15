@@ -18,7 +18,7 @@ pub trait Component {
         trace!("Observability started...");
         let mut scope = Scope::init(&matches)?;
         Self::handle(&mut scope, &matches)?;
-        scope.store.close();
+        scope.store.close()?;
         Ok(())
     }
 }

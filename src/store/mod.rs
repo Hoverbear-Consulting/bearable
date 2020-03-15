@@ -3,8 +3,6 @@ use crate::structures::{Client, ExpenseReport, Invoice, Structure};
 use anyhow::Result;
 use anymap::AnyMap;
 use retriever::types::storage::Storage;
-use std::path::PathBuf;
-use std::sync::Arc;
 use tracing::trace;
 
 pub struct Store {

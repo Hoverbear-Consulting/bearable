@@ -6,7 +6,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::fs::{create_dir_all, OpenOptions};
-use std::hash::Hash;
+use std::io::{Read, Seek};
 use std::iter::FromIterator;
 use std::path::{Path, PathBuf};
 use tracing::{field, info, trace};
@@ -14,14 +14,14 @@ use tracing::{field, info, trace};
 const STASH: &str = "data";
 
 pub trait Dataset<D>:
-    Serialize + DeserializeOwned + Debug + FromIterator<D> + IntoIterator<Item = D> + Clone
+    Serialize + DeserializeOwned + Debug + Default + FromIterator<D> + IntoIterator<Item = D> + Clone
 where
     D: Structure + Record<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys>,
 {
     const STORE: &'static str;
 
     fn store_path() -> PathBuf {
-        Path::new(STASH).join(Self::STORE).with_extension("csv")
+        Path::new(STASH).join(Self::STORE).with_extension("json")
     }
 
     fn ensure_store_dir() -> Result<()> {
@@ -34,40 +34,32 @@ where
     fn stow(self) -> Result<()> {
         Self::ensure_store_dir()?;
         let store_path = Self::store_path();
+        trace!(opening = field::debug(Self::store_path()));
         let handle = OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(true)
             .open(store_path)?;
-        let mut writer = csv::WriterBuilder::new()
-            .has_headers(true)
-            .from_writer(handle);
         info!("Writing...");
-        for item in self {
-            writer.serialize(item)?;
-        }
+        serde_json::to_writer_pretty(handle, &self)?;
         Ok(())
     }
 
     fn unstow() -> Result<Self> {
         Self::ensure_store_dir()?;
-        let handle = OpenOptions::new().read(true).open(Self::store_path())?;
-        let mut reader = csv::ReaderBuilder::new()
-            .has_headers(true)
-            .from_reader(handle);
-        info!("Reading...");
-        reader
-            .deserialize()
-            .map(|v| match v {
-                Ok(v) => {
-                    // This is not actually a no-op!
-                    let v: D = v;
-                    trace!(item = field::debug(v.clone()));
-                    Ok(v)
-                }
-                Err(e) => Err(e.into()),
-            })
-            .collect::<Result<Self>>()
+        trace!(opening = field::debug(Self::store_path()));
+        let handle = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(Self::store_path())?;
+        let dataset = if handle.metadata()?.len() != 0 {
+            let dataset: Self = serde_json::from_reader(handle)?;
+            dataset
+        } else {
+            Self::default()
+        };
+        Ok(dataset)
     }
 
     fn storage() -> Result<Storage<D::ChunkKeys, D::ItemKeys, D>> {

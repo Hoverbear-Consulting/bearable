@@ -12,7 +12,6 @@ mod invoice;
 pub use invoice::Invoice;
 
 mod root;
-use retriever::traits::record::Record;
 pub use root::Root;
 use std::hash::Hash;
 

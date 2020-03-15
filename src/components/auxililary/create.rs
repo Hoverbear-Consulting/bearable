@@ -1,13 +1,11 @@
 use crate::components::auxililary::Interactive;
 use crate::components::Component;
-use crate::dataset::Dataset;
 use crate::scope::Scope;
 use crate::structures::Structure;
 use anyhow::{anyhow, Result};
 use clap::{App, ArgMatches};
 use retriever::traits::record::Record;
 use retriever::types::storage::Storage;
-use tracing::{field, trace};
 
 pub struct Create<D: Structure + Interactive>(D);
 
@@ -22,10 +20,10 @@ impl<
         App::new("create")
     }
 
-    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
+    fn handle(scope: &mut Scope, _args: &ArgMatches) -> Result<()> {
         let new = D::interactive()?;
 
-        let mut dataset: &mut Storage<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys, D> =
+        let dataset: &mut Storage<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys, D> =
             scope
                 .store
                 .datasets

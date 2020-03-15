@@ -7,7 +7,7 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn init(args: &ArgMatches) -> Result<Self> {
+    pub fn init(_args: &ArgMatches) -> Result<Self> {
         Ok(Self {
             store: Store::init()?,
         })

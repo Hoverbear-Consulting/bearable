@@ -1,5 +1,4 @@
 use crate::components::Component;
-use crate::dataset::Dataset;
 use crate::scope::Scope;
 use crate::structures::Structure;
 use anyhow::{anyhow, Result};
