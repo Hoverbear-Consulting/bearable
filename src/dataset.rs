@@ -1,19 +1,22 @@
-use crate::datum::Datum;
-use anyhow::{anyhow, Result};
+use crate::structures::Structure;
+use anyhow::Result;
+use retriever::traits::record::Record;
+use retriever::types::storage::Storage;
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use serde::Serialize;
 use std::fmt::Debug;
-use std::fs::{create_dir_all, File, OpenOptions};
-use std::io::Read;
+use std::fs::{create_dir_all, OpenOptions};
+use std::hash::Hash;
 use std::iter::FromIterator;
 use std::path::{Path, PathBuf};
 use tracing::{field, info, trace};
 
 const STASH: &str = "data";
 
-pub trait Dataset<D: Datum>:
-    Serialize + DeserializeOwned + Debug + FromIterator<D> + IntoIterator<Item = D>
+pub trait Dataset<D>:
+    Serialize + DeserializeOwned + Debug + FromIterator<D> + IntoIterator<Item = D> + Clone
+where
+    D: Structure + Record<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys>,
 {
     const STORE: &'static str;
 
@@ -31,11 +34,11 @@ pub trait Dataset<D: Datum>:
     fn stow(self) -> Result<()> {
         Self::ensure_store_dir()?;
         let store_path = Self::store_path();
-        let mut handle = OpenOptions::new()
+        let handle = OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(true)
-            .open(Self::store_path())?;
+            .open(store_path)?;
         let mut writer = csv::WriterBuilder::new()
             .has_headers(true)
             .from_writer(handle);
@@ -48,7 +51,7 @@ pub trait Dataset<D: Datum>:
 
     fn unstow() -> Result<Self> {
         Self::ensure_store_dir()?;
-        let mut handle = OpenOptions::new().read(true).open(Self::store_path())?;
+        let handle = OpenOptions::new().read(true).open(Self::store_path())?;
         let mut reader = csv::ReaderBuilder::new()
             .has_headers(true)
             .from_reader(handle);
@@ -66,8 +69,25 @@ pub trait Dataset<D: Datum>:
             })
             .collect::<Result<Self>>()
     }
+
+    fn storage() -> Result<Storage<D::ChunkKeys, D::ItemKeys, D>> {
+        let dataset = Self::unstow()?;
+        trace!(dataset_size = field::debug(dataset.clone()));
+        let mut storage = Storage::new();
+        for datum in dataset {
+            trace!(item_added = field::debug(datum.clone()));
+            storage.add(datum);
+        }
+        Ok(storage)
+    }
+
+    fn from_storage(storage: Storage<D::ChunkKeys, D::ItemKeys, D>) -> Self {
+        storage.iter().cloned().collect()
+    }
 }
 
-impl<D: Datum> Dataset<D> for Vec<D> {
+impl<D: Structure + Record<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys>> Dataset<D>
+    for Vec<D>
+{
     const STORE: &'static str = D::STORE;
 }

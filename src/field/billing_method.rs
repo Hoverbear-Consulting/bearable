@@ -1,13 +1,12 @@
-use crate::record::HasVariants;
+use crate::field::HasVariants;
 use anyhow::anyhow;
-use serde::export::fmt::Error;
 use serde::export::Formatter;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
 use tracing::trace;
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BillingMethod {
     /// ACH
     AutomatedClearingHouse,

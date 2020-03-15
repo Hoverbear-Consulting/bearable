@@ -1,11 +1,10 @@
+use crate::scope::Scope;
 use crate::{
-    components::{auxililary::Create, Component},
-    datum::{Client, ExpenseReport, Invoice, Root},
+    components::Component,
+    structures::{Client, ExpenseReport, Invoice, Root},
 };
 use anyhow::{anyhow, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
-use serde::{Deserialize, Serialize};
-use std::path::Path;
 use tracing::{field, info, trace};
 
 impl Component for Root {
@@ -24,15 +23,13 @@ impl Component for Root {
             .subcommands(vec![Client::app(), Invoice::app(), ExpenseReport::app()])
     }
 
-    fn handle(args: &ArgMatches) -> Result<()> {
-        crate::observability::init(args.value_of("log"))?;
-        trace!("Observability started...");
+    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
         trace!(args = field::debug(args));
         info!("Welcome to Bearable!");
         match args.subcommand() {
-            ("client", Some(args)) => Client::handle(args),
-            ("invoice", Some(args)) => Invoice::handle(args),
-            ("expense-report", Some(args)) => ExpenseReport::handle(args),
+            ("client", Some(args)) => Client::handle(scope, args),
+            ("invoice", Some(args)) => Invoice::handle(scope, args),
+            ("expense-report", Some(args)) => ExpenseReport::handle(scope, args),
             _ => Err(anyhow!("Invalid subcommand.")),
         }
     }

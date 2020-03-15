@@ -1,12 +1,11 @@
 use crate::components::auxililary::Interactive;
+use crate::scope::Scope;
 use crate::{
     components::{auxililary::Create, Component},
-    datum::ExpenseReport,
+    structures::ExpenseReport,
 };
 use anyhow::Result;
-use clap::{App, AppSettings, Arg, ArgMatches};
-use serde::{Deserialize, Serialize};
-use std::path::Path;
+use clap::{App, AppSettings, ArgMatches};
 use tracing::{field, trace};
 
 impl Component for ExpenseReport {
@@ -16,7 +15,7 @@ impl Component for ExpenseReport {
             .subcommands(vec![<Create<Self> as Component>::app()])
     }
 
-    fn handle(args: &ArgMatches) -> Result<()> {
+    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
         trace!(args = field::debug(args));
         unimplemented!()
     }

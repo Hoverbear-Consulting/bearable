@@ -12,10 +12,32 @@ mod invoice;
 pub use invoice::Invoice;
 
 mod root;
+use retriever::traits::record::Record;
 pub use root::Root;
+use std::hash::Hash;
 
 mod expense_report;
 
-pub trait Datum: Serialize + DeserializeOwned + Debug + Clone {
+pub trait Structure:
+    Serialize + DeserializeOwned + Debug + Clone + PartialEq + Eq + PartialOrd + Ord + Hash
+{
     const STORE: &'static str;
+    type ChunkKeys: Serialize
+        + DeserializeOwned
+        + Debug
+        + Clone
+        + PartialEq
+        + Eq
+        + PartialOrd
+        + Ord
+        + Hash;
+    type ItemKeys: Serialize
+        + DeserializeOwned
+        + Debug
+        + Clone
+        + PartialEq
+        + Eq
+        + PartialOrd
+        + Ord
+        + Hash;
 }

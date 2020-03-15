@@ -1,12 +1,11 @@
 use crate::components::auxililary::Interactive;
+use crate::scope::Scope;
 use crate::{
     components::{auxililary::Create, Component},
-    datum::Invoice,
+    structures::Invoice,
 };
 use anyhow::Result;
-use clap::{App, AppSettings, Arg, ArgMatches};
-use serde::{Deserialize, Serialize};
-use std::path::Path;
+use clap::{App, AppSettings, ArgMatches};
 use tracing::{field, trace};
 
 impl Component for Invoice {
@@ -16,7 +15,7 @@ impl Component for Invoice {
             .subcommands(vec![<Create<Self> as Component>::app()])
     }
 
-    fn handle(args: &ArgMatches) -> Result<()> {
+    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
         trace!(args = field::debug(args));
         unimplemented!()
     }
@@ -24,6 +23,15 @@ impl Component for Invoice {
 
 impl Interactive for Invoice {
     fn interactive() -> Result<Self> {
-        unimplemented!()
+        unimplemented!();
+        // let theme = dialoguer::theme::ColorfulTheme::default();
+        // Ok(Self {
+        //     client: Input::with_theme(&theme).with_prompt("client").interact()?,
+        //     number: Input::with_theme(&theme).with_prompt("number").interact()?,
+        //     date_issued: Input::with_theme(&theme)
+        //         .with_prompt("Date Issued")
+        //         .interact()?,
+        //     lines: vec![],
+        // })
     }
 }

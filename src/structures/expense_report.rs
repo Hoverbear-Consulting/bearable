@@ -1,22 +1,34 @@
-use super::{Client, Datum};
+use super::{Client, Structure};
 use crate::field::LineItem;
-use crate::record::auxiliary::HasKey;
+use retriever::traits::record::Record;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExpenseReport {
-    customer: Client,
+    client: (
+        <Client as Structure>::ChunkKeys,
+        <Client as Structure>::ItemKeys,
+    ),
     number: usize,
     lines: Vec<LineItem>,
 }
 
-impl Datum for ExpenseReport {
+impl Structure for ExpenseReport {
     const STORE: &'static str = "expense-reports";
+    type ChunkKeys = (
+        <Client as Structure>::ChunkKeys,
+        <Client as Structure>::ItemKeys,
+    );
+    type ItemKeys = usize;
 }
 
-impl HasKey for ExpenseReport {
-    type ChunkKeys = Client;
-    const CHUNK_KEY_FIELDS: &'static [&'static str] = &["customer"];
-    type ItemKeys = usize;
-    const ITEM_KEY_FIELDS: &'static [&'static str] = &["number"];
+impl Record<<Self as Structure>::ChunkKeys, <Self as Structure>::ItemKeys> for ExpenseReport {
+    fn chunk_key(&self) -> Cow<<Self as Structure>::ChunkKeys> {
+        Cow::Borrowed(&self.client)
+    }
+
+    fn item_key(&self) -> Cow<<Self as Structure>::ItemKeys> {
+        Cow::Borrowed(&self.number)
+    }
 }

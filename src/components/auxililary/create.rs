@@ -1,30 +1,38 @@
 use crate::components::auxililary::Interactive;
 use crate::components::Component;
-use crate::datum::Datum;
-use crate::Dataset;
-use anyhow::Result;
+use crate::dataset::Dataset;
+use crate::scope::Scope;
+use crate::structures::Structure;
+use anyhow::{anyhow, Result};
 use clap::{App, ArgMatches};
-use dialoguer::Input;
+use retriever::traits::record::Record;
+use retriever::types::storage::Storage;
 use tracing::{field, trace};
 
-pub struct Create<D: Datum + Interactive>(D);
+pub struct Create<D: Structure + Interactive>(D);
 
-impl<D: Datum + Interactive> Component for Create<D> {
+impl<
+        D: 'static
+            + Structure
+            + Interactive
+            + Record<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys>,
+    > Component for Create<D>
+{
     fn app() -> App<'static, 'static> {
         App::new("create")
     }
 
-    fn handle(args: &ArgMatches) -> Result<()> {
-        let mut new = D::interactive()?;
+    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
+        let new = D::interactive()?;
 
-        trace!(args = field::debug(args));
-        let mut dataset = Vec::<D>::unstow()?;
+        let mut dataset: &mut Storage<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys, D> =
+            scope
+                .store
+                .datasets
+                .get_mut()
+                .ok_or(anyhow!("Failed to get dataset."))?;
+        dataset.add(new);
 
-        trace!(pre = field::debug(dataset.clone()));
-        dataset.push(new);
-        trace!(post = field::debug(dataset.clone()));
-
-        Vec::<D>::stow(dataset)?;
         Ok(())
     }
 }

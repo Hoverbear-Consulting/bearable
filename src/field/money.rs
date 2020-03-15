@@ -1,11 +1,11 @@
 use super::Currency;
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter, Write};
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use tracing::trace;
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Money {
     /// In the smallest denomination! Eg Cents
     amount: u128,

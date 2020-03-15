@@ -1,22 +1,33 @@
 use crate::components::Component;
-use crate::datum::Datum;
-use crate::Dataset;
-use anyhow::Result;
+use crate::dataset::Dataset;
+use crate::scope::Scope;
+use crate::structures::Structure;
+use anyhow::{anyhow, Result};
 use clap::{App, ArgMatches};
-use tracing::{field, info, trace};
+use retriever::traits::record::Record;
+use retriever::types::storage::Storage;
+use tracing::{field, trace};
 
-pub struct List<D: Datum>(D);
+pub struct List<D: Structure>(D);
 
-impl<D: Datum> Component for List<D> {
+impl<D: 'static + Structure + Record<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys>>
+    Component for List<D>
+{
     fn app() -> App<'static, 'static> {
         App::new("list")
     }
 
-    fn handle(args: &ArgMatches) -> Result<()> {
+    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
         trace!(args = field::debug(args));
-        let dataset = Vec::<D>::unstow()?;
-        trace!(dataset = field::debug(dataset.clone()));
-        Vec::<D>::stow(dataset)?;
+
+        let dataset: &Storage<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys, D> = scope
+            .store
+            .datasets
+            .get()
+            .ok_or(anyhow!("Failed to get dataset."))?;
+        let data = dataset.iter().collect::<Vec<&D>>();
+        println!("{:?}", data);
+
         Ok(())
     }
 }

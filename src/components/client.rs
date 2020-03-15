@@ -1,15 +1,14 @@
+use crate::scope::Scope;
 use crate::{
     components::{
         auxililary::{Create, Interactive, List},
         Component,
     },
-    datum::Client,
+    structures::Client,
 };
 use anyhow::{anyhow, Result};
-use clap::{App, AppSettings, Arg, ArgMatches};
+use clap::{App, AppSettings, ArgMatches};
 use dialoguer::Input;
-use serde::{Deserialize, Serialize};
-use std::path::Path;
 use tracing::{field, trace};
 
 impl Component for Client {
@@ -19,11 +18,11 @@ impl Component for Client {
             .subcommands(vec![Create::<Self>::app(), List::<Self>::app()])
     }
 
-    fn handle(args: &ArgMatches) -> Result<()> {
+    fn handle(scope: &mut Scope, args: &ArgMatches) -> Result<()> {
         trace!(args = field::debug(args));
         match args.subcommand() {
-            ("create", Some(args)) => <Create<Self> as Component>::handle(args),
-            ("list", Some(args)) => <List<Self> as Component>::handle(args),
+            ("create", Some(args)) => <Create<Self> as Component>::handle(scope, args),
+            ("list", Some(args)) => <List<Self> as Component>::handle(scope, args),
             _ => Err(anyhow!("Invalid subcommand.")),
         }
     }

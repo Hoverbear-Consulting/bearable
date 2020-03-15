@@ -1,21 +1,13 @@
-use crate::{
-    components::Component,
-    datum::{Client, ExpenseReport, Invoice, Root},
-};
-use anyhow::{anyhow, Result};
-use clap::{App, AppSettings, Arg, ArgMatches};
-use serde::{Deserialize, Serialize};
-use std::path::Path;
-use std::str::FromStr;
-use tracing::{info, Level};
-use tracing_subscriber::FmtSubscriber;
+use crate::{components::Component, structures::Root};
+use anyhow::Result;
 
 mod components;
 mod dataset;
-mod datum;
-pub use dataset::Dataset;
+mod field;
 mod observability;
-mod record;
+mod scope;
+mod store;
+mod structures;
 
 fn main() -> Result<()> {
     Root::execute()

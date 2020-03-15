@@ -1,11 +1,11 @@
-use crate::record::HasVariants;
+use crate::field::HasVariants;
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
-use tracing::{field, trace};
+use tracing::trace;
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Currency {
     Canadian,
     American,
