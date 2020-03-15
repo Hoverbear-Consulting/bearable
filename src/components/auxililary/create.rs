@@ -6,6 +6,7 @@ use anyhow::{anyhow, Result};
 use clap::{App, ArgMatches};
 use retriever::traits::record::Record;
 use retriever::types::storage::Storage;
+use tracing::{field, trace};
 
 pub struct Create<D: Structure + Interactive>(D);
 
@@ -22,6 +23,7 @@ impl<
 
     fn handle(scope: &mut Scope, _args: &ArgMatches) -> Result<()> {
         let new = D::interactive()?;
+        trace!(new_item = field::debug(&new));
 
         let dataset: &mut Storage<<D as Structure>::ChunkKeys, <D as Structure>::ItemKeys, D> =
             scope
